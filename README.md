@@ -12,7 +12,9 @@ Download the train/val/test splits from [link](https://data.mendeley.com/dataset
 # Training model
 1. activate the conda environment: `conda activate meta-learning`
 2. run the bash script `bash ./exp_script/run_best.sh`  
-The model checkpoint will be automatically save the to the folde `./log/` for downstream evaluations.
+The model checkpoint will be automatically save the to the folde `./log/` for downstream evaluations.  
+
+_You can also download the trained model direclty from [Google Drive](https://drive.google.com/drive/folders/1K6_SwzUwYHv30VsDnrLnI9iV1veNniY0?usp=sharing)_
 
 # Cr design experiment
 Please refer to the provided `paper_figures.ipynb` notebook.
