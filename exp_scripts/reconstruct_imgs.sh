@@ -28,11 +28,3 @@
 # python pso_baseline_mdn_only.py --device 3 --painting_path ./photo_data/the_white_orchard.jpg &
 
 # python pso_baseline_mdn_only.py --device 4 --painting_path ./photo_data/great_wall.jpg
-
-python pso_baseline_mdn_init_multitask.py --device 0 --painting_path ./photo_data/yellowstone_haozhu.jpg
-
-python pso_baseline_mdn_init_multitask.py --device 0 --painting_path ./photo_data/yellowstone_haozhu.jpg --random_init
-
-python pso_baseline_mdn_only.py --device 0 --painting_path ./photo_data/yellowstone_haozhu.jpg
-
-python pso_baseline_mdn_init_multitask_one_layer.py --device 0 --painting_path ./photo_data/tulip_fields.jpg
