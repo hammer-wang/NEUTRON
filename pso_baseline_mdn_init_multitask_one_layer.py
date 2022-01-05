@@ -1,37 +1,27 @@
-import pyswarms as ps
-from pyswarms.utils.functions import single_obj as fx
-
-import numpy as np
+import glob
+import itertools
 import json
-from scipy.stats import mode
+import multiprocessing
+import os
+import pickle as pkl
+import time
 
-from colour.difference import delta_E, delta_E_CIE2000
-from tmm import coh_tmm, inc_tmm
+import colour
+import numpy as np
+import pyswarms as ps
+import pytorch_lightning as pl
+import torch
 from colour import SDS_ILLUMINANTS, SpectralDistribution
 from colour.colorimetry import MSDS_CMFS
-import colour
-
-from simulation.multilayer_thin_film import load_nk
-import glob
-import pickle as pkl
+from colour.difference import delta_E, delta_E_CIE2000
+from PIL import Image
+from pyswarms.utils.functions import single_obj as fx
+from scipy.stats import mode
+from tmm import coh_tmm, inc_tmm
 from tqdm import tqdm
-import torch
-import time
-import multiprocessing
-import itertools
-from joblib import Parallel, delayed
-import os
-import joblib
-import pytorch_lightning as pl
-from torch.utils.data import Dataset, DataLoader
 
 from multitask_training import MultitaskDataset, MultitaskMDN
-
-from PIL import Image
-import scipy.misc
-
-import colour
-from colour.difference import delta_E_CIE2000
+from simulation.multilayer_thin_film import load_nk
 
 illuminant = SDS_ILLUMINANTS['D65']
 cmfs = MSDS_CMFS['CIE 1931 2 Degree Standard Observer']

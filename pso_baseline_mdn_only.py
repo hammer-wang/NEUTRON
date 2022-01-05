@@ -1,36 +1,23 @@
-import pyswarms as ps
-from pyswarms.utils.functions import single_obj as fx
-
-import numpy as np
+import glob
+import itertools
 import json
+import multiprocessing
+import os
+import pickle as pkl
+import time
 
-from colour.difference import delta_E, delta_E_CIE2000
-from tmm import coh_tmm, inc_tmm
+import colour
+import numpy as np
+import torch
 from colour import SDS_ILLUMINANTS, SpectralDistribution
 from colour.colorimetry import MSDS_CMFS
-import colour
-
-from simulation.multilayer_thin_film import load_nk
-import glob
-import pickle as pkl
+from PIL import Image
+from pyswarms.utils.functions import single_obj as fx
+from tmm import inc_tmm
 from tqdm import tqdm
-import torch
-import time
-import multiprocessing
-import itertools
-from joblib import Parallel, delayed
-import os
-import joblib
-import pytorch_lightning as pl
-from torch.utils.data import Dataset, DataLoader
 
 from multitask_training import MultitaskDataset, MultitaskMDN
-
-from PIL import Image
-import scipy.misc
-
-import colour
-from colour.difference import delta_E_CIE2000
+from simulation.multilayer_thin_film import load_nk
 
 illuminant = SDS_ILLUMINANTS['D65']
 cmfs = MSDS_CMFS['CIE 1931 2 Degree Standard Observer']
@@ -99,11 +86,10 @@ if __name__ == '__main__':
     model = MultitaskMDN.load_from_checkpoint(model_path, lr=data['lr'], hidden_dim=data['hidden_dim'], n_mixtures=data['n_mixtures'], train_ratio=data['train_ratio'], alpha=data['alpha'], seed=data['seed'], weight_decay=data['weight_decay'])
     model = model.to(device)
 
-    datapath = '/data/hzwang/Projects/meta-learning-photonics-design/simulation/multilayer_data/sRGB_400K'
+    datapath = './simulation/multilayer_data/sRGB_400K'
     dataset = MultitaskDataset(datapath)
     quantize = True
-
-    # paintings = ['./photo_data/eiffel_tower.jpg', './photo_data/great_wall.jpg', './photo_data/the_white_orchard.jpg', './photo_data/tulip_fields.jpg']
+    
     pool = multiprocessing.Pool(args.pop_size)
 
     image = Image.open(painting)
@@ -114,11 +100,6 @@ if __name__ == '__main__':
         step_size = 10
         RGB_quantize = (RGB / step_size).astype(int) * step_size
         RGB = np.unique(RGB_quantize, axis=0)
-
-    # # Identify the best materials
-    # RGB_tensor = dataset.rgb_scaler.transform(RGB)
-    # RGB_tensor = torch.tensor(RGB_tensor).float().to(device)
-
 
     # Compute Lab target
     Labs_target = [colour.XYZ_to_Lab(colour.sRGB_to_XYZ(item)) for item in tqdm(RGB / 255)]
@@ -160,7 +141,6 @@ if __name__ == '__main__':
         design = dataset.thickness_scaler.inverse_transform(design)
         design_list.append(design)
     design_list = np.array(design_list).squeeze()
-    # design_list = design_list.transpose(1, 0, 2)
 
     # map location to the unique row id
     shape = np.array(image).shape
@@ -175,41 +155,11 @@ if __name__ == '__main__':
     all_thickness = []
     nk_dicts = []
 
-
-    # for i, target in tqdm(enumerate(Labs_target)):
-        
-    #     def color_difference(x):
-    #         thickness = np.hstack((x, 100 * np.ones((len(x), 1)))).astype(int)
-    #         thickness = [thickness[i] for i in range(len(thickness))]
-    #         res = pool.starmap(get_color, itertools.product([nk_dict], thickness))
-
-    #         Labs = [item[3] for item in res]
-    #         deltaE = [delta_E_CIE2000(lab, target) for lab in Labs]
-    #         return np.array(deltaE)
-
-
-    #     ## TODO: instead of using a single 
-    #     init_pos = design_list[i, :, :4]
-    #     init_pos[:, 0] = np.clip(init_pos[:, 0], a_min=5, a_max=250)
-    #     init_pos[:, 1] = np.clip(init_pos[:, 1], a_min=5, a_max=15)
-    #     init_pos[:, 2] = np.clip(init_pos[:, 2], a_min=5, a_max=15)
-    #     init_pos[:, 3] = np.clip(init_pos[:, 3], a_min=5, a_max=250)
-        
-    #     if not args.random_init:
-    #         optimizer = ps.single.GlobalBestPSO(n_particles=args.pop_size, dimensions=4, options=options, bounds=([5, 5, 5, 5], [250, 15, 15, 250]), init_pos=init_pos, ftol=1e-5, ftol_iter=5)
-    #     else:
-    #         optimizer = ps.single.GlobalBestPSO(n_particles=args.pop_size, dimensions=4, options=options, bounds=([5, 5, 5, 5], [250, 15, 15, 250]), ftol=1e-5, ftol_iter=5)
-    #     cost, pos = optimizer.optimize(color_difference, 100, verbose=True)
-    #     all_thickness.append(pos)
-
     end_time = time.time()
     all_thickness = design_list
     all_thickness = np.array(all_thickness).astype(int)
 
-    # import pdb; pdb.set_trace()
-
     all_thickness = design_list.tolist()
-    # import pdb; pdb.set_trace()
     res = pool.starmap(get_color, itertools.product([nk_dict], all_thickness))
     RGBs_designed = [item[2] for item in res]
     Labs_designed = [item[3] for item in res]

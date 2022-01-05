@@ -1,36 +1,25 @@
-import pyswarms as ps
-from pyswarms.utils.functions import single_obj as fx
-
-import numpy as np
+import glob
+import itertools
 import json
+import multiprocessing
+import os
+import pickle as pkl
+import time
 
-from colour.difference import delta_E, delta_E_CIE2000
-from tmm import coh_tmm, inc_tmm
+import colour
+import numpy as np
+import pyswarms as ps
+import torch
 from colour import SDS_ILLUMINANTS, SpectralDistribution
 from colour.colorimetry import MSDS_CMFS
-import colour
-
-from simulation.multilayer_thin_film import load_nk
-import glob
-import pickle as pkl
+from colour.difference import delta_E_CIE2000
+from PIL import Image
+from pyswarms.utils.functions import single_obj as fx
+from tmm import inc_tmm
 from tqdm import tqdm
-import torch
-import time
-import multiprocessing
-import itertools
-from joblib import Parallel, delayed
-import os
-import joblib
-import pytorch_lightning as pl
-from torch.utils.data import Dataset, DataLoader
 
 from multitask_training import MultitaskDataset, MultitaskMDN
-
-from PIL import Image
-import scipy.misc
-
-import colour
-from colour.difference import delta_E_CIE2000
+from simulation.multilayer_thin_film import load_nk
 
 illuminant = SDS_ILLUMINANTS['D65']
 cmfs = MSDS_CMFS['CIE 1931 2 Degree Standard Observer']
@@ -92,18 +81,17 @@ if __name__ == '__main__':
     print('Reconstructing {}'.format(painting_name))
 
     device = args.device
-    model_path = glob.glob('./logs/1202_nmixtures_400K/nmix51200_400K/lightning_logs/version_0/checkpoints/*.ckpt')[0]
-    f = open('./logs/1202_nmixtures_400K/nmix51200_400K/hparams.json')
+    model_path = glob.glob(f'{model_path}/lightning_logs/version_0/checkpoints/*.ckpt')[0]
+    f = open('f{model_path}/hparams.json')
     data = json.load(f)
     f.close()
     model = MultitaskMDN.load_from_checkpoint(model_path, lr=data['lr'], hidden_dim=data['hidden_dim'], n_mixtures=data['n_mixtures'], train_ratio=data['train_ratio'], alpha=data['alpha'], seed=data['seed'], weight_decay=data['weight_decay'])
     model = model.to(device)
 
-    datapath = '/data/hzwang/Projects/meta-learning-photonics-design/simulation/multilayer_data/sRGB_400K'
+    datapath = './simulation/multilayer_data/sRGB_400K'
     dataset = MultitaskDataset(datapath)
     quantize = True
 
-    # paintings = ['./photo_data/eiffel_tower.jpg', './photo_data/great_wall.jpg', './photo_data/the_white_orchard.jpg', './photo_data/tulip_fields.jpg']
     pool = multiprocessing.Pool(args.pop_size)
 
     image = Image.open(painting)
@@ -114,10 +102,6 @@ if __name__ == '__main__':
         step_size = 10
         RGB_quantize = (RGB / step_size).astype(int) * step_size
         RGB = np.unique(RGB_quantize, axis=0)
-
-    # # Identify the best materials
-    # RGB_tensor = dataset.rgb_scaler.transform(RGB)
-    # RGB_tensor = torch.tensor(RGB_tensor).float().to(device)
 
 
     # Compute Lab target
