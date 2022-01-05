@@ -1,0 +1,21 @@
+name: meta-learning
+channels:
+  - defaults
+dependencies:
+  - pytorch
+  - torchvision
+  - cudatoolkit=11.1
+  - torchaudio
+  - pandas
+  - scikit-learn=1.0.1
+  - jupyterlab
+  - colour-science
+  - tqdm
+  - seaborn
+  - pydoe2
+  - ipykernel
+  - pytorch-lightning
+  - mpi4py
+  - tensorboard
+  - nodejs=16.12.0
+prefix: /home/hzwang/anaconda3/envs/meta-learning
