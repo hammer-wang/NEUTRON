@@ -18,4 +18,3 @@ dependencies:
   - mpi4py
   - tensorboard
   - nodejs=16.12.0
-prefix: /home/hzwang/anaconda3/envs/meta-learning
