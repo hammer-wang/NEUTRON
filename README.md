@@ -14,7 +14,7 @@ Download the train/val/test splits from [link](https://data.mendeley.com/dataset
 2. run the bash script `bash ./exp_script/run_best.sh`  
 The model checkpoint will be automatically save the to the folde `./log/` for downstream evaluations.  
 
-_You can also download the trained model direclty from [Google Drive](https://drive.google.com/drive/folders/1K6_SwzUwYHv30VsDnrLnI9iV1veNniY0?usp=sharing)_
+_You can also download a trained model direclty from [Google Drive](https://drive.google.com/drive/folders/1K6_SwzUwYHv30VsDnrLnI9iV1veNniY0?usp=sharing)_
 
 # Cr design experiment
 Please refer to the provided `paper_figures.ipynb` notebook.
@@ -23,7 +23,7 @@ Please refer to the provided `paper_figures.ipynb` notebook.
 Please refer to the bash script `./exp_scripts/reconstruct_imgs.sh`. 
 
 ____________
-If you find this repository useful for your research, please consider citing as:  
+If you find this repository useful for your research, please consider citing us as:  
 
 ```
 @article{wang3992098neutron,
