@@ -31,9 +31,14 @@ ____________
 If you find this repository useful for your research, please consider citing us as:  
 
 ```latex
-@article{wang3992098neutron,
-  title={Neutron: Neural Particle Swarm Optimization for Material-Aware Inverse Design of Structural Color},
+@article{wang2022neutron,
+  title={NEUTRON: Neural particle swarm optimization for material-aware inverse design of structural color},
   author={Wang, Haozhu and Guo, L Jay},
-  journal={Available at SSRN 3992098}
+  journal={iScience},
+  volume={25},
+  number={5},
+  pages={104339},
+  year={2022},
+  publisher={Elsevier}
 }
 ```
